@@ -1,16 +1,43 @@
-# flutteruser
+# Flutter User Authentication App
 
-A new Flutter project.
+Это простое Flutter-приложение, которое позволяет пользователю войти в систему, ввести свои данные (имя и email), сохранить их локально и вывести на главной странице. Пользователь может выйти из аккаунта, и данные будут удалены из локального хранилища.
 
-## Getting Started
+## Описание
 
-This project is a starting point for a Flutter application.
+Приложение состоит из двух экранов:
+1. **Экран авторизации** — позволяет пользователю ввести имя и email.
+2. **Главная страница** — отображает введённые пользователем данные.
 
-A few resources to get you started if this is your first Flutter project:
+При успешной авторизации данные сохраняются локально с помощью библиотеки `shared_preferences`, и пользователь может выйти из аккаунта.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Требования
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Flutter SDK
+- Плагин `shared_preferences` для хранения данных локально.
+
+## Установка
+
+1. Клонируйте репозиторий:
+
+   ```bash
+   git clone https://github.com/yourusername/flutter_user_auth_app.git
+
+2. Перейдите в каталог проекта:
+   ```bash
+   cd flutter_user_auth_app
+
+3. Установите зависимости:
+   ```bash
+   flutter pub get
+
+4. Запустите:
+   ```bash
+   flutter run
+
+
+## Основные функции
+
+- **Ввод имени и email в экране авторизации.**
+- **Сохранение данных с использованием** `shared_preferences`.
+- **Отображение имени и email на главной странице после авторизации.**
+- **Возможность выхода из аккаунта с удалением данных.**
