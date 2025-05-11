@@ -10,13 +10,13 @@ class MyApp extends StatelessWidget {
 
   Future<bool> _isLoggedIn() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.containsKey('username');
+    return prefs.containsKey('username') && prefs.containsKey('email');
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Авторизация',
+      title: 'User Auth App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
@@ -45,13 +45,17 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
 
-  void _login() async {
-    final name = _controller.text.trim();
-    if (name.isNotEmpty) {
+  // Сохраняем имя и email в локальное хранилище
+  Future<void> _saveUser() async {
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    if (name.isNotEmpty && email.isNotEmpty) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('username', name);
+      await prefs.setString('email', email);
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
@@ -63,18 +67,27 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Вход')),
+      appBar: AppBar(title: const Text('Авторизация')),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
-              controller: _controller,
-              decoration: const InputDecoration(labelText: 'Введите имя'),
+              controller: _nameController,
+              decoration: const InputDecoration(labelText: 'Имя'),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(onPressed: _login, child: const Text('Войти')),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _emailController,
+              decoration: const InputDecoration(labelText: 'Email'),
+              keyboardType: TextInputType.emailAddress,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: _saveUser,
+              child: const Text('Сохранить'),
+            ),
           ],
         ),
       ),
@@ -91,23 +104,22 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String username = '';
+  String email = '';
 
-  @override
-  void initState() {
-    super.initState();
-    _loadUser();
-  }
-
-  void _loadUser() async {
+  // Загружаем сохраненные данные
+  Future<void> _loadUser() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       username = prefs.getString('username') ?? '';
+      email = prefs.getString('email') ?? '';
     });
   }
 
-  void _logout() async {
+  // Удаляем данные и возвращаемся на экран авторизации
+  Future<void> _logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('username');
+    await prefs.remove('email');
     if (!mounted) return;
     Navigator.pushReplacement(
       context,
@@ -116,21 +128,35 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Главная'),
+        title: const Text('Главная страница'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
+            tooltip: 'Выйти',
             onPressed: _logout,
           ),
         ],
       ),
-      body: Center(
-        child: Text(
-          'Привет, $username!',
-          style: const TextStyle(fontSize: 24),
+      body: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Добро пожаловать, $username!',
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            Text('Email: $email', style: const TextStyle(fontSize: 18)),
+          ],
         ),
       ),
     );
